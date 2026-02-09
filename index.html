@@ -1,378 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>Will You Be My Valentine? 💕</title> -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Quicksand', sans-serif;
-        }
-        
-        .heart {
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            25% { transform: scale(1.1); }
-            50% { transform: scale(1); }
-        }
-        
-        .float {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .celebration {
-            animation: celebration 0.5s ease-out;
-        }
-        
-        @keyframes celebration {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Will you be my Valentine?</title>
 
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #f0f;
-            position: absolute;
-            animation: fall 3s linear;
-        }
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
+  <style>
+    :root {
+      --primary: #d946ef;
+      --secondary: #ec4899;
+      --accent: #f43f5e;
+      --light: #fce7f3;
+      --lighter: #fdf2f8;
+      --gold: #fbbf24;
+      --text: #1e293b;
+      --text-light: #64748b;
+    }
 
-        .slide-in {
-            animation: slideIn 0.5s ease-out;
-        }
+    * { box-sizing: border-box; }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    body {
+      margin: 0;
+      height: 100svh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 25%, #ede9fe 50%, #fce7f3 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      font-family: 'Segoe UI', Trebuchet MS, sans-serif;
+      overflow: auto;
+      padding: 12px;
+      position: relative;
+    }
 
-        .button-container {
-            position: relative;
-            min-height: 80px;
-            width: 100%;
-            overflow-x: hidden;
-        }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-        .button-container > div {
-            width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
+    /* Floating elements */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      opacity: 0.3;
+      pointer-events: none;
+      filter: blur(40px);
+    }
 
-        .button-container button {
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+    body::before {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--primary), transparent);
+      top: -100px;
+      right: -100px;
+      animation: float 20s ease-in-out infinite;
+    }
 
-        @media (max-width: 640px) {
-            .button-container {
-                min-height: 100px;
-            }
+    body::after {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, var(--secondary), transparent);
+      bottom: -80px;
+      left: -80px;
+      animation: float 25s ease-in-out infinite reverse;
+    }
 
-            .button-container button {
-                flex-shrink: 1;
-                min-width: auto;
-            }
-        }
-    </style>
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(30px, -30px); }
+      66% { transform: translate(-20px, 20px); }
+    }
+
+    /* FULL-SCREEN CONFETTI CANVAS */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .card {
+      width: min(100%, 95vw);
+      max-width: 600px;
+      padding: 30px 25px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px);
+      border-radius: 35px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(217, 70, 239, 0.15), 0 0 60px rgba(236, 72, 153, 0.1);
+      position: relative;
+      z-index: 100;
+      animation: cardEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes cardEnter {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .art {
+      width: min(220px, 75vw);
+      margin: 0 auto 20px;
+      display: block;
+      filter: drop-shadow(0 15px 35px rgba(217, 70, 239, 0.25));
+      animation: artFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes artFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    h1 {
+      font-size: clamp(22px, 4vw, 36px);
+      margin: 10px 0 5px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-light);
+      margin: 0 0 20px;
+      font-weight: 500;
+    }
+
+    .button-zone {
+      position: relative;
+      width: min(420px, 85%);
+      height: 100px;
+      margin: 0 auto 20px;
+      touch-action: none;
+    }
+
+    button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 14px 26px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      letter-spacing: 0.5px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active {
+      transform: translateY(-50%) scale(0.98);
+    }
+
+    #yesBtn {
+      left: 10%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      font-size: 16px;
+      padding: 14px 28px;
+      box-shadow: 0 15px 35px rgba(217, 70, 239, 0.35);
+    }
+
+    #yesBtn:hover {
+      box-shadow: 0 20px 45px rgba(217, 70, 239, 0.5);
+      transform: translateY(-52%) scale(1.05);
+    }
+
+    #noBtn {
+      left: 55%;
+      background: rgba(248, 113, 113, 0.1);
+      color: var(--accent);
+      border: 2px solid rgba(244, 63, 94, 0.3);
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    #noBtn:hover {
+      background: rgba(248, 113, 113, 0.15);
+      border-color: rgba(244, 63, 94, 0.5);
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-light);
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    .result {
+      display: none;
+      margin-top: 15px;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .result h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      margin: 8px 0 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      animation: bounce 0.6s ease;
+    }
+
+    .fireworks {
+      width: min(280px, 80vw);
+      margin: 0 auto;
+      display: block;
+      border-radius: 15px;
+      box-shadow: 0 20px 50px rgba(217, 70, 239, 0.2);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8) rotate(-5deg);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      25% { transform: translateY(-15px); }
+      50% { transform: translateY(0); }
+    }
+
+    /* Sparkle effect */
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: sparkle 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-pink-100 via-pink-50 to-purple-100 min-h-screen flex items-center justify-center overflow-hidden p-4">
-    
-    <!-- Floating hearts background -->
-    <div id="hearts-container" class="fixed inset-0 pointer-events-none z-0"></div>
-    
-    <!-- Page 1: Initial Question -->
-    <div id="page-1" class="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-200 slide-in">
-        <div class="heart text-5xl sm:text-6xl mb-4 sm:mb-6">💖</div>
-        
-        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">Will You Be My Valentine?</h1>
-        
-        <p class="text-gray-600 mb-6 sm:mb-8 text-base sm:text-lg">Please say yes... 🥺</p>
-        
-        <div class="button-container">
-            <div class="flex gap-3 sm:gap-4 justify-center items-center flex-wrap">
-                <button id="yes-btn-1" class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 text-lg sm:text-xl">
-                    Yes! 💕
-                </button>
-                
-                <button id="no-btn-1" class="bg-gray-300 text-gray-600 font-bold py-2 sm:py-3 px-5 sm:px-6 rounded-full shadow-md transition-all duration-200 text-base sm:text-lg">
-                    No
-                </button>
-            </div>
-        </div>
-        
-        <p class="text-pink-400 mt-4 sm:mt-6 text-xs sm:text-sm italic">Try clicking No... I dare you! 😉</p>
-    </div>
 
-    <!-- Page 2: Please Why No? -->
-    <div id="page-2" class="hidden relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-200 slide-in">
-        <div class="text-5xl sm:text-6xl mb-4 sm:mb-6">🥺</div>
-        
-        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">Please... Why No?</h1>
-        
-        <p class="text-gray-600 mb-4 sm:mb-6 text-base sm:text-lg">Give me a chance! 💔</p>
-        
-        <p class="text-pink-500 mb-6 sm:mb-8 text-sm sm:text-md">I promise to make you happy! 🌹</p>
-        
-        <div class="button-container">
-            <div class="flex gap-3 sm:gap-4 justify-center items-center flex-wrap">
-                <button id="yes-btn-2" class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 text-xl sm:text-2xl">
-                    Yes! 💕
-                </button>
-                
-                <button id="no-btn-2" class="bg-gray-300 text-gray-600 font-bold py-2 sm:py-3 px-5 sm:px-6 rounded-full shadow-md transition-all duration-200 text-base sm:text-lg">
-                    No
-                </button>
-            </div>
-        </div>
-    </div>
+<body>
+  <canvas id="confettiCanvas"></canvas>
 
-    <!-- Page 3: Are You Sure? -->
-    <div id="page-3" class="hidden relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-200 slide-in">
-        <div class="text-5xl sm:text-6xl mb-4 sm:mb-6">😢</div>
-        
-        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">Are You Really Sure?</h1>
-        
-        <p class="text-gray-600 mb-4 sm:mb-6 text-base sm:text-lg">My heart is breaking... 💔</p>
-        
-        <p class="text-pink-500 mb-6 sm:mb-8 text-sm sm:text-md">Just one little "Yes"? Pretty please? 🙏</p>
-        
-        <div class="button-container">
-            <div class="flex gap-3 sm:gap-4 justify-center items-center flex-wrap">
-                <button id="yes-btn-3" class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-4 sm:py-5 px-10 sm:px-12 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 text-xl sm:text-2xl">
-                    YES! 💕
-                </button>
-                
-                <button id="no-btn-3" class="bg-gray-300 text-gray-600 font-bold py-2 px-4 sm:px-5 rounded-full shadow-md transition-all duration-200 text-sm">
-                    No
-                </button>
-            </div>
-        </div>
-    </div>
+  <main class="card">
+    <!-- ANIMAL WITH HEART -->
+    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fur" x1="0" x2="1">
+          <stop offset="0" stop-color="#f7c7a1"/>
+          <stop offset="1" stop-color="#f2a97b"/>
+        </linearGradient>
+        <linearGradient id="heart" x1="0" x2="1">
+          <stop offset="0" stop-color="#ff4d7d"/>
+          <stop offset="1" stop-color="#ff1f68"/>
+        </linearGradient>
+      </defs>
 
-    <!-- Page 4: Think About It -->
-    <div id="page-4" class="hidden relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-200 slide-in">
-        <div class="text-5xl sm:text-6xl mb-4 sm:mb-6">😭</div>
-        
-        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">Please Think About It!</h1>
-        
-        <p class="text-gray-600 mb-4 sm:mb-6 text-base sm:text-lg">We could be so happy together! 💕</p>
-        
-        <div class="mb-6 sm:mb-8">
-            <p class="text-pink-500 mb-2 text-sm sm:text-base">✨ Cute dates</p>
-            <p class="text-pink-500 mb-2 text-sm sm:text-base">🌹 Lots of love</p>
-            <p class="text-pink-500 mb-2 text-sm sm:text-base">💖 All the happiness</p>
-        </div>
-        
-        <div class="button-container">
-            <div class="flex gap-3 sm:gap-4 justify-center items-center flex-wrap">
-                <button id="yes-btn-4" class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-4 sm:py-6 px-12 sm:px-16 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 text-2xl sm:text-3xl">
-                    YES! 💕
-                </button>
-                
-                <button id="no-btn-4" class="bg-gray-400 text-gray-600 font-bold py-1 px-3 sm:px-4 rounded-full shadow-md transition-all duration-200 text-xs">
-                    no
-                </button>
-            </div>
-        </div>
-    </div>
+      <path d="M250 50 C250 33 270 25 282 38
+               C294 25 314 33 314 50
+               C314 78 282 92 282 106
+               C282 92 250 78 250 50Z"
+            fill="url(#heart)"/>
 
-    <!-- Page 5: Last Chance -->
-    <div id="page-5" class="hidden relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-200 slide-in">
-        <div class="text-5xl sm:text-6xl mb-4 sm:mb-6">🥹</div>
-        
-        <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">This Is My Last Try!</h1>
-        
-        <p class="text-gray-600 mb-4 sm:mb-6 text-base sm:text-lg">I'm running out of ways to ask... 😅</p>
-        
-        <p class="text-pink-500 mb-6 sm:mb-8 text-lg sm:text-xl font-semibold">Will you PLEASE be my Valentine? 💝</p>
-        
-        <div class="mb-4 sm:mb-6 text-3xl sm:text-4xl">
-            <span class="heart">💗</span>
-            <span class="heart" style="animation-delay: 0.2s">💖</span>
-            <span class="heart" style="animation-delay: 0.4s">💕</span>
-        </div>
-        
-        <div class="button-container">
-            <div class="flex gap-3 sm:gap-4 justify-center items-center flex-wrap">
-                <button id="yes-btn-5" class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-5 sm:py-6 px-16 sm:px-20 rounded-full shadow-lg transform hover:scale-110 transition-all duration-300 text-2xl sm:text-3xl">
-                    YES!!! 💕
-                </button>
-                
-                <button id="no-btn-5" class="bg-gray-500 text-white font-bold py-1 px-2 sm:px-3 rounded-full shadow-md transition-all duration-200 text-xs opacity-50">
-                    n
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Success Page -->
-    <div id="success-page" class="hidden relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-12 max-w-md w-full text-center border-4 border-pink-300 slide-in">
-        <div class="celebration text-6xl sm:text-8xl mb-4 sm:mb-6">🎉💖🎉</div>
-        
-        <h1 class="text-4xl sm:text-5xl font-bold text-pink-600 mb-3 sm:mb-4 px-2">Yay!!!</h1>
-        
-        <p class="text-gray-700 text-lg sm:text-xl mb-4 sm:mb-6">I knew you'd say yes eventually! 💕</p>
-        
-        <p class="text-pink-500 text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">You just made me the happiest! 🥰</p>
-        
-        <div class="flex justify-center gap-2 text-3xl sm:text-4xl mb-4 sm:mb-6">
-            <span class="heart">💖</span>
-            <span class="heart" style="animation-delay: 0.2s">💝</span>
-            <span class="heart" style="animation-delay: 0.4s">💗</span>
-            <span class="heart" style="animation-delay: 0.6s">💓</span>
-        </div>
-        
-        <p class="text-gray-600 text-base sm:text-lg">Happy Valentine's Day, my Valentine! 🌹</p>
-    </div>
+      <path d="M90 120 C90 70 140 40 190 60
+               C240 40 290 70 290 120
+               C290 180 240 210 190 210
+               C140 210 90 180 90 120Z"
+            fill="url(#fur)"/>
 
-    <script>
-        const heartsContainer = document.getElementById('hearts-container');
-        
-        // Create floating hearts background (fewer on mobile)
-        function createFloatingHeart() {
-            const heart = document.createElement('div');
-            heart.innerHTML = '💗';
-            heart.className = 'fixed text-xl sm:text-2xl opacity-30 float';
-            heart.style.left = Math.random() * 100 + '%';
-            heart.style.top = Math.random() * 100 + '%';
-            heart.style.animationDelay = Math.random() * 3 + 's';
-            heartsContainer.appendChild(heart);
-        }
-        
-        const heartCount = window.innerWidth < 640 ? 10 : 15;
-        for (let i = 0; i < heartCount; i++) {
-            createFloatingHeart();
-        }
+      <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
+      <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
 
-        // Function to move button randomly (mobile-friendly)
-        function moveButton(button) {
-            const page = button.closest('[id^="page-"]');
-            const pageRect = page.getBoundingClientRect();
-            const buttonRect = button.getBoundingClientRect();
-            
-            // Calculate safe bounds for mobile
-            const padding = 20;
-            const maxX = pageRect.width - buttonRect.width - (padding * 2);
-            const maxY = pageRect.height - buttonRect.height - (padding * 2);
-            
-            // Generate random position
-            const randomX = Math.max(padding, Math.random() * maxX);
-            const randomY = Math.max(padding, Math.random() * maxY);
-            
-            button.style.position = 'absolute';
-            button.style.left = randomX + 'px';
-            button.style.top = randomY + 'px';
-            button.style.transform = 'none';
-        }
+      <circle cx="160" cy="130" r="8"/>
+      <circle cx="220" cy="130" r="8"/>
 
-        // Function to show page
-        function showPage(pageId) {
-            document.querySelectorAll('[id^="page-"]').forEach(page => page.classList.add('hidden'));
-            document.getElementById('success-page').classList.add('hidden');
-            const targetPage = document.getElementById(pageId);
-            targetPage.classList.remove('hidden');
-            
-            // Reset button positions on new page
-            const noBtn = targetPage.querySelector('[id^="no-btn-"]');
-            if (noBtn) {
-                noBtn.style.position = 'relative';
-                noBtn.style.left = 'auto';
-                noBtn.style.top = 'auto';
-            }
-        }
+      <path d="M190 144 C186 144 182 148 182 152
+               C182 160 190 164 190 170
+               C190 164 198 160 198 152
+               C198 148 194 144 190 144Z"
+            fill="#ff7aa2"/>
+    </svg>
 
-        // Function to show success
-        function showSuccess() {
-            document.querySelectorAll('[id^="page-"]').forEach(page => page.classList.add('hidden'));
-            document.getElementById('success-page').classList.remove('hidden');
-            createConfetti();
-        }
+    <h1>Will you be my Valentine?</h1>
+    <p class="subtitle">Let's make this moment unforgettable ✨</p>
 
-        // Create confetti effect
-        function createConfetti() {
-            const colors = ['#ff69b4', '#ff1493', '#ff6b9d', '#c71585', '#db7093', '#ffc0cb'];
-            const confettiCount = window.innerWidth < 640 ? 50 : 100;
-            
-            for (let i = 0; i < confettiCount; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + '%';
-                    confetti.style.top = '-10px';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    document.body.appendChild(confetti);
-                    
-                    setTimeout(() => confetti.remove(), 3000);
-                }, i * 30);
-            }
-        }
+    <section class="button-zone" id="zone">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </section>
 
-        // Setup button handlers
-        function setupPageHandlers(pageNum) {
-            const noBtn = document.getElementById(`no-btn-${pageNum}`);
-            const yesBtn = document.getElementById(`yes-btn-${pageNum}`);
-            
-            // Handle both hover (desktop) and touch (mobile)
-            noBtn.addEventListener('mouseenter', function() {
-                if (window.innerWidth > 640) {
-                    moveButton(this);
-                }
-            });
+    <!-- HINT -->
+    <div class="hint" id="hint">That "No" button is feeling a little lonely... 😊</div>
 
-            // For mobile - move on touchstart
-            noBtn.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                moveButton(this);
-            });
+    <section class="result" id="result">
+      <h2>You just made my day! 💕</h2>
+      <img
+        class="fireworks"
+        src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
+        alt="Fireworks"
+      />
+      <p style="margin-top: 12px; color: #64748b; font-size: 14px;">This is going to be amazing...</p>
+    </section>
+  </main>
 
-            noBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (pageNum < 5) {
-                    showPage(`page-${pageNum + 1}`);
-                } else {
-                    alert("Okay fine, I'm taking that as a YES! 💕");
-                    showSuccess();
-                }
-            });
+  <script>
+    const zone = document.getElementById("zone");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const hint = document.getElementById("hint");
 
-            yesBtn.addEventListener('click', showSuccess);
-        }
+    /* ---------- CONFETTI ---------- */
+    const confettiCanvas = document.getElementById("confettiCanvas");
 
-        // Setup all pages
-        for (let i = 1; i <= 5; i++) {
-            setupPageHandlers(i);
-        }
-    </script>
+    function resizeConfettiCanvas() {
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      confettiCanvas.width = Math.floor(window.innerWidth * dpr);
+      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+      confettiCanvas.style.width = "100vw";
+      confettiCanvas.style.height = "100vh";
+    }
+
+    resizeConfettiCanvas();
+    window.addEventListener("resize", resizeConfettiCanvas);
+    window.addEventListener("orientationchange", () => setTimeout(resizeConfettiCanvas, 150));
+
+    const confettiInstance = confetti.create(confettiCanvas, {
+      resize: false,
+      useWorker: true
+    });
+
+    function fullScreenConfetti() {
+      const end = Date.now() + 1600;
+
+      (function frame() {
+        confettiInstance({
+          particleCount: 12,
+          spread: 90,
+          startVelocity: 45,
+          ticks: 180,
+          origin: { x: Math.random(), y: Math.random() * 0.3 }
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+
+      setTimeout(() => {
+        confettiInstance({
+          particleCount: 300,
+          spread: 140,
+          startVelocity: 60,
+          ticks: 220,
+          origin: { x: 0.5, y: 0.55 }
+        });
+      }, 300);
+    }
+
+    /* ---------- YES BUTTON GROWS ---------- */
+    let yesScale = 1;
+    function growYes() {
+      yesScale = Math.min(2.2, yesScale + 0.1);
+      yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
+    }
+
+    /* ---------- NO BUTTON RUNS AWAY ---------- */
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function moveNo(px, py) {
+      const z = zone.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      let dx = (b.left + b.width / 2) - px;
+      let dy = (b.top + b.height / 2) - py;
+      let mag = Math.hypot(dx, dy) || 1;
+      dx /= mag;
+      dy /= mag;
+
+      let newLeft = (b.left - z.left) + dx * 150;
+      let newTop  = (b.top - z.top) + dy * 150;
+
+      newLeft = clamp(newLeft, 0, z.width - b.width);
+      newTop  = clamp(newTop, 0, z.height - b.height);
+
+      noBtn.style.left = newLeft + "px";
+      noBtn.style.top = newTop + "px";
+      noBtn.style.transform = "none";
+
+      growYes();
+    }
+
+    zone.addEventListener("pointermove", e => {
+      const b = noBtn.getBoundingClientRect();
+      const d = Math.hypot(
+        (b.left + b.width / 2) - e.clientX,
+        (b.top + b.height / 2) - e.clientY
+      );
+      if (d < 140) moveNo(e.clientX, e.clientY);
+    });
+
+    noBtn.addEventListener("click", e => e.preventDefault());
+
+    /* ---------- YES CLICK ---------- */
+    yesBtn.addEventListener("click", () => {
+      zone.style.display = "none";
+      hint.style.display = "none";     // HIDE THE HINT
+      result.style.display = "block";
+      resizeConfettiCanvas();
+      fullScreenConfetti();
+    });
+  </script>
 </body>
-
 </html>
-
-
